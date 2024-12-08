@@ -62,6 +62,30 @@ async function run() {
         res.status(500).send({ message: "Failed to fetch items", error: error.message });
       }
     });
+    app.get('/my-items/:id', async (req, res) => {
+      const id = req.params.id;
+      try {
+        
+        if (!ObjectId.isValid(id)) {
+          res.status(400).send({ message: "Invalid ID format" });
+          return;
+        }
+    
+        
+        const item = await myItemsCollection.findOne({ _id: new ObjectId(id) });
+    
+        if (!item) {
+          res.status(404).send({ message: "Item not found" });
+          return;
+        }
+    
+        
+        res.send(item);
+      } catch (error) {
+        res.status(500).send({ message: "Failed to fetch item", error: error.message });
+      }
+    });
+    
     app.delete('/my-items/:id', async (req, res) => {
       const id = req.params.id;
       try {
@@ -79,6 +103,41 @@ async function run() {
         res.status(500).send({ message: "Failed to delete item", error: error.message });
       }
     });
+    app.put('/my-items/:id', async (req, res) => {
+      const id = req.params.id; 
+      let updatedFields = req.body; 
+    
+      try {
+        
+        if (!ObjectId.isValid(id)) {
+          res.status(400).send({ message: "Invalid ID format" });
+          return;
+        }
+    
+        
+        if (updatedFields._id) {
+          delete updatedFields._id;
+        }
+    
+        
+        const result = await myItemsCollection.updateOne(
+          { _id: new ObjectId(id) }, 
+          { $set: updatedFields }, 
+          { returnDocument: 'after' } 
+        );
+    
+        if (result.value) {
+          res.status(200).send({ message: "Item updated successfully", updatedItem: result.value });
+        } else {
+          res.status(404).send({ message: "Item not found" });
+        }
+      } catch (error) {
+        console.error("Update error:", error.message);
+        res.status(500).send({ message: "Failed to update item", error: error.message });
+      }
+    });
+    
+    
     
 
     app.post('/products', async (req, res) => {
@@ -175,8 +234,33 @@ async function run() {
         res.status(500).send({ message: "Server error", error: error.message });
       }
     });
-
-
+    app.put('/add_equipments/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedProduct = req.body;
+    
+      try {
+        if (!ObjectId.isValid(id)) {
+          res.status(400).send({ message: "Invalid ID format" });
+          return;
+        }
+    
+        const result = await equipmentsCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: updatedProduct }
+        );
+    
+        if (result.matchedCount > 0) {
+          res.status(200).send({ message: 'Product updated successfully' });
+        } else {
+          res.status(404).send({ message: 'Product not found' });
+        }
+      } catch (error) {
+        console.error('Error updating product:', error); 
+        res.status(500).send({ message: 'Server error', error: error.message });
+      }
+    });
+    
+    
 
     app.post('/users', async (req, res) => {
       try {
@@ -201,6 +285,31 @@ async function run() {
         res.status(500).send({ message: "Failed to fetch users", error: error.message });
       }
     });
+    app.get('/add_equipments/:id', async (req, res) => {
+      const id = req.params.id;
+      try {
+        
+        if (!ObjectId.isValid(id)) {
+          res.status(400).send({ message: "Invalid ID format" });
+          return;
+        }
+    
+       
+        const equipment = await equipmentsCollection.findOne({ _id: new ObjectId(id) });
+    
+        
+        if (!equipment) {
+          res.status(404).send({ message: "Equipment not found" });
+          return;
+        }
+    
+        
+        res.send(equipment);
+      } catch (error) {
+        res.status(500).send({ message: "Failed to fetch equipment", error: error.message });
+      }
+    });
+    
 
 
     console.log("Connected to MongoDB and routes are ready!");
