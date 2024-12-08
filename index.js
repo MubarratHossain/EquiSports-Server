@@ -7,7 +7,8 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 
-app.use(cors('https://historical-elbow.surge.sh/'));
+app.use(cors({ origin: 'https://historical-elbow.surge.sh' }));
+
 app.use(express.json());
 
 
