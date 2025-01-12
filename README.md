@@ -18,7 +18,8 @@
 To run this project locally, follow these steps:
 
 1. Clone the repository:
-   ```bashhttps://github.com/MubarratHossain/EquiSports-Server
+   ```bash
+   https://github.com/MubarratHossain/EquiSports-Server
   
 
 
